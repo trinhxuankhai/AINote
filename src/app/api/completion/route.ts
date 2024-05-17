@@ -1,38 +1,22 @@
-import { OpenAIApi, Configuration } from "openai-edge";
-import { OpenAIStream, StreamingTextResponse } from "ai";
-// /api/completion
-const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(config);
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { StreamingTextResponse } from "ai";
+import { GoogleGenerativeAIStream } from "ai"
 
 export async function POST(req: Request) {
   // extract the prompt from the body
   const { prompt } = await req.json();
+  console.log(prompt)
 
-  const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "system",
-        content: `You are a helpful AI embedded in a notion text editor app that is used to autocomplete sentences
-            The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
-        AI is a well-behaved and well-mannered individual.
-        AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.`,
-      },
-      {
-        role: "user",
-        content: `
-        I am writing a piece of text in a notion text editor app.
-        Help me complete my train of thought here: ##${prompt}##
-        keep the tone of the text consistent with the rest of the text.
-        keep the response short and sweet.
-        `,
-      },
-    ],
-    stream: true,
-  });
-  const stream = OpenAIStream(response);
+  // Access your API key (see "Set up your API key" above)
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  // For text-only input, use the gemini-pro model
+  const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+  const msg = `I am writing a piece of text in a Notion text editor app and need help completing my train of thought. Here is the text so far:
+  ${prompt}
+  Please continue the provided text in with a consistent tone. DO NOT include the provided text.`;
+
+  const response = await model.generateContentStream(msg);
+  const stream = GoogleGenerativeAIStream(response);
   return new StreamingTextResponse(stream);
 }

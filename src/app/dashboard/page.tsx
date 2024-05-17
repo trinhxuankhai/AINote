@@ -14,10 +14,13 @@ type Props = {};
 
 const DashboardPage = async (props: Props) => {
   const { userId } = auth();
+  // const notes = await db
+  //   .select()
+  //   .from($notes)
+  //   .where(eq($notes.userId, userId!));
   const notes = await db
     .select()
-    .from($notes)
-    .where(eq($notes.userId, userId!));
+    .from($notes);
 
   return (
     <>
@@ -57,12 +60,13 @@ const DashboardPage = async (props: Props) => {
               return (
                 <a href={`/notebook/${note.id}`} key={note.id}>
                   <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
-                    <Image
+                    {/* <Image
                       width={400}
                       height={200}
                       alt={note.name}
                       src={note.imageUrl || ""}
-                    />
+                    /> */}
+                    <div style={{ width: 400, height: 200, backgroundColor: 'yellow' }}></div>  
                     <div className="p-4">
                       <h3 className="text-xl font-semibold text-gray-900">
                         {note.name}

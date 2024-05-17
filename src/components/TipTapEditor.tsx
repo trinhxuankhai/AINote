@@ -13,6 +13,49 @@ import { useCompletion } from "ai/react";
 
 type Props = { note: NoteType };
 
+function popTextBlock() {
+  const textEditorContainer = document.querySelector(".prose"); // Assuming ".prose" is the class of the container for the text editor
+  
+  // Create a wrapper div for text block and close button
+  const wrapperDiv = document.createElement("div");
+  wrapperDiv.style.display = "flex"; // Ensure the wrapper div expands to fill the container width
+  wrapperDiv.style.marginBottom = "10px"; // Add some margin at the bottom for spacing
+  
+  // Create the text block
+  const textBlock = document.createElement("textarea");
+  textBlock.setAttribute("rows", "4");
+  textBlock.setAttribute("cols", "50");
+  textBlock.style.width = "100%"; // Set text block width to 100% to match its parent width
+  textBlock.style.padding = "8px"; // Add padding for better appearance
+  textBlock.style.border = "1px solid #ccc"; // Add border
+  textBlock.style.borderRadius = "4px"; // Add border radius
+  textBlock.style.resize = "none"; // Disable resizing
+  
+  // Create the close button
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "Generate";
+  closeButton.style.padding = "8px 12px"; // Add padding for better appearance
+  closeButton.style.marginLeft = "8px"; // Add margin to separate from text block
+  closeButton.style.border = "1px solid #ccc"; // Add border
+  closeButton.style.borderRadius = "4px"; // Add border radius
+  closeButton.style.backgroundColor = "#fff"; // Add background color
+  closeButton.style.cursor = "pointer"; // Change cursor on hover
+  closeButton.addEventListener("click", () => {
+      // Remove the text block and the wrapper when the close button is clicked
+      wrapperDiv.remove();
+  });
+
+  // Append text block and close button to the wrapper div
+  wrapperDiv.appendChild(textBlock);
+  wrapperDiv.appendChild(closeButton);
+
+  // Append the wrapper div to the text editor container
+  textEditorContainer.appendChild(wrapperDiv);
+
+  // Focus on the text block
+  textBlock.focus();
+}
+
 const TipTapEditor = ({ note }: Props) => {
   const [editorState, setEditorState] = React.useState(
     note.editorState || `<h1>${note.name}</h1>`
@@ -31,14 +74,22 @@ const TipTapEditor = ({ note }: Props) => {
   });
   const customText = Text.extend({
     addKeyboardShortcuts() {
-      return {
-        "Shift-a": () => {
-          // take the last 30 words
-          const prompt = this.editor.getText().split(" ").slice(-30).join(" ");
-          complete(prompt);
-          return true;
-        },
+      const shortcuts = {
+          "Shift-a": () => {
+              const prompt = this.editor.getText();
+              complete(prompt);
+              console.log("activate AI");
+              return true;
+          },
+          "Shift-b": () => {
+              // Code to pop a text block for entering text
+              console.log("Space pressed. Pop a text block for entering text.");
+              popTextBlock();
+              return true;
+          }
       };
+
+      return shortcuts;
     },
   });
 
@@ -50,13 +101,20 @@ const TipTapEditor = ({ note }: Props) => {
       setEditorState(editor.getHTML());
     },
   });
+
   const lastCompletion = React.useRef("");
 
   React.useEffect(() => {
-    if (!completion || !editor) return;
+    if (!completion || !editor) {
+      lastCompletion.current = "";
+      return;
+  }
+    console.log(lastCompletion.current.length);
     const diff = completion.slice(lastCompletion.current.length);
     lastCompletion.current = completion;
     editor.commands.insertContent(diff);
+    console.log(completion);
+    console.log(diff);
   }, [completion, editor]);
 
   const debouncedEditorState = useDebounce(editorState, 500);

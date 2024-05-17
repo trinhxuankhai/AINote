@@ -25,7 +25,8 @@ const NotebookPage = async ({ params: { noteId } }: Props) => {
   const notes = await db
     .select()
     .from($notes)
-    .where(and(eq($notes.id, parseInt(noteId)), eq($notes.userId, userId)));
+    // .where(and(eq($notes.id, parseInt(noteId)), eq($notes.userId, userId)));
+    .where(eq($notes.id, parseInt(noteId)));
 
   if (notes.length != 1) {
     return redirect("/dashboard");
