@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   // Access your API key (see "Set up your API key" above)
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   // For text-only input, use the gemini-pro model
-  const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest"});
 
   const msg = `I am writing a piece of text in a Notion text editor app and need help completing my train of thought. Here is the text so far:
   ${prompt}

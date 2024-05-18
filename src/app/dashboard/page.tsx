@@ -57,16 +57,22 @@ const DashboardPage = async (props: Props) => {
           <div className="grid sm:grid-cols-3 md:grid-cols-5 grid-cols-1 gap-3">
             <CreateNoteDialog />
             {notes.map((note) => {
+              // Function to generate a random color
+              const getRandomColor = () => {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                  color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+              };
+
+              const randomColor = getRandomColor();
+
               return (
                 <a href={`/notebook/${note.id}`} key={note.id}>
                   <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
-                    {/* <Image
-                      width={400}
-                      height={200}
-                      alt={note.name}
-                      src={note.imageUrl || ""}
-                    /> */}
-                    <div style={{ width: 400, height: 200, backgroundColor: 'yellow' }}></div>  
+                    <div style={{ width: 400, height: 200, backgroundColor: randomColor }}></div>  
                     <div className="p-4">
                       <h3 className="text-xl font-semibold text-gray-900">
                         {note.name}
